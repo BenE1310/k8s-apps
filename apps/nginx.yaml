@@ -11,7 +11,7 @@ spec:
     path: base/nginx
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: nginx-lab
   syncPolicy:
     automated:
       prune: true
