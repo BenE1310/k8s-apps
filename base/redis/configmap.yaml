@@ -5,4 +5,4 @@ metadata:
   namespace: redis-lab
 data:
   redis.conf: |
-    requirepass ${REDIS_PASSWORD}
+    requirepass mySuperSecret123
