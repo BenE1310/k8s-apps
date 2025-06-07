@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-commander
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BenE1310/k8s-apps
+    targetRevision: HEAD
+    path: base/redis-commander
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: redis-lab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
