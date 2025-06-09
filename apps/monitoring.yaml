@@ -12,10 +12,12 @@ spec:
     helm:
       releaseName: monitoring
       values: |
+        crds:
+          install: true
         grafana:
           service:
             type: LoadBalancer
-          adminPassword: admin123  # 👈 change later with SealedSecrets!
+          adminPassword: admin123
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
