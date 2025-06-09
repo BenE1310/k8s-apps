@@ -19,6 +19,9 @@ spec:
           ports:
             - containerPort: 8081
           env:
-            - name: REDIS_HOSTS
-              value: "local:redis:6379,auth=mySuperSecret123"
-
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              value: "mySuperSecret123"
