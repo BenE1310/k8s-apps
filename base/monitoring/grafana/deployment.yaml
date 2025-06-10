@@ -18,3 +18,11 @@ spec:
           image: grafana/grafana
           ports:
             - containerPort: 3000
+          volumeMounts:
+            - name: datasource-config
+              mountPath: /etc/grafana/provisioning/datasources
+              readOnly: true
+      volumes:
+        - name: datasource-config
+          configMap:
+            name: grafana-datasource
