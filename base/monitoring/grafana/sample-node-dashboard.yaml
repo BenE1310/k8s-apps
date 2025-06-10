@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-config
+  namespace: grafana
+  labels:
+    grafana_dashboard: "1"
+data:
+  dashboard-provider.yaml: |
+    apiVersion: 1
+    providers:
+      - name: 'default'
+        orgId: 1
+        folder: 'General'
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        options:
+          path: /etc/grafana/provisioning/dashboards
