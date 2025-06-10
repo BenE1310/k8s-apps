@@ -11,7 +11,7 @@ data:
     providers:
       - name: 'default'
         orgId: 1
-        folder: 'Provisioned Dashboards'
+        folder: 'Provisioned'
         type: file
         disableDeletion: false
         updateIntervalSeconds: 10
