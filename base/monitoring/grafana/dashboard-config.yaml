@@ -11,9 +11,9 @@ data:
     providers:
       - name: 'default'
         orgId: 1
-        folder: 'General'
+        folder: 'Provisioned Dashboards'
         type: file
         disableDeletion: false
         updateIntervalSeconds: 10
         options:
-          path: /etc/grafana/provisioning/dashboards
+          path: /var/lib/grafana/dashboards
