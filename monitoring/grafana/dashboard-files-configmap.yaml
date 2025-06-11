@@ -1,4 +1,8 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: grafana
 data:
   node-cpu-usage.json: |
     {
@@ -18,15 +22,7 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "percent",
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {"color": "green", "value": null},
-                  {"color": "orange", "value": 70},
-                  {"color": "red", "value": 90}
-                ]
-              }
+              "unit": "percent"
             }
           },
           "gridPos": {
@@ -42,8 +38,3 @@ data:
       "version": 1,
       "refresh": "10s"
     }
-kind: ConfigMap
-metadata:
-  creationTimestamp: null
-  name: grafana-dashboards
-  namespace: grafana
