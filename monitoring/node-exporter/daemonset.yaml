@@ -3,8 +3,6 @@ kind: DaemonSet
 metadata:
   name: node-exporter
   namespace: prometheus
-  labels:
-    app: node-exporter
 spec:
   selector:
     matchLabels:
@@ -13,17 +11,12 @@ spec:
     metadata:
       labels:
         app: node-exporter
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9100"
     spec:
-      hostPID: true
-      hostNetwork: true
       containers:
         - name: node-exporter
           image: quay.io/prometheus/node-exporter:latest
           ports:
-            - name: metrics
+            - name: metrics         # 👈 required name for endpoint discovery
               containerPort: 9100
           volumeMounts:
             - name: proc
