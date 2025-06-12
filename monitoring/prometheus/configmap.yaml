@@ -22,3 +22,14 @@ data:
       - job_name: 'prometheus'
         static_configs:
           - targets: ['localhost:9090']
+      - job_name: 'fake-exporter'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_label_app]
+            action: keep
+            regex: fake-exporter
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
