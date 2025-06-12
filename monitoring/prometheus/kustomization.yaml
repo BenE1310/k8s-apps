@@ -1,0 +1,5 @@
+resources:
+  - grafana/
+  - prometheus/
+  - thanos/
+  - kube-state-metrics/
