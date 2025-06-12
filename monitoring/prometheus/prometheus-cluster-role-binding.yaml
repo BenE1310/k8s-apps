@@ -8,5 +8,5 @@ roleRef:
   name: prometheus
 subjects:
   - kind: ServiceAccount
-    name: prometheus
+    name: prometheus-sa
     namespace: prometheus
