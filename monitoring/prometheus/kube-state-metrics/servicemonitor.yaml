@@ -8,10 +8,10 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: kube-state-metrics
+      app.kubernetes.io/name: kube-state-metrics   # use more standard label if applicable
   endpoints:
     - port: http
       interval: 15s
   namespaceSelector:
     matchNames:
-      - prometheus
+      - kube-system       # <== FIXED

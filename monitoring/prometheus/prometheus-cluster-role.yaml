@@ -61,3 +61,26 @@ rules:
       - storageclasses
       - volumeattachments
     verbs: ["get", "list", "watch"]
+  - apiGroups: ["", "apps", "autoscaling", "batch", "extensions", "policy", "rbac.authorization.k8s.io", "coordination.k8s.io", "networking.k8s.io", "storage.k8s.io"]
+    resources:
+      - nodes
+      - namespaces
+      - deployments
+      - replicasets
+      - statefulsets
+      - daemonsets
+      - pods
+      - services
+      - endpoints
+      - persistentvolumes
+      - persistentvolumeclaims
+      - jobs
+      - cronjobs
+      - ingresses
+      - configmaps
+      - secrets
+      - resourcequotas
+      - horizontalpodautoscalers
+      - networkpolicies
+      - storageclasses
+    verbs: ["get", "list", "watch"]
