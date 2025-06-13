@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/BenE1310/k8s-apps
     targetRevision: HEAD
-    path: base/redis-commander
+    path: base/mongodb
   destination:
     server: https://kubernetes.default.svc
     namespace: redis-lab
