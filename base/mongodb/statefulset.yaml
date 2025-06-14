@@ -14,22 +14,9 @@ spec:
       labels:
         app: mongo
     spec:
-      initContainers:
-        - name: mongo-init
-          image: mongo:6.0.13-jammy
-          command: ["/bin/sh", "-c"]
-          args:
-            - |
-              echo "Sleeping to let MongoDB start...";
-              sleep 15;
-              echo "Running replica set initiation...";
-              mongosh --host mongo-0.mongo-headless:27017 /init/init.js
-          volumeMounts:
-            - name: init-script
-              mountPath: /init
       containers:
         - name: mongo
-          image: mongo:6
+          image: mongo:6.0.13-jammy
           ports:
             - containerPort: 27017
           volumeMounts:
@@ -46,10 +33,30 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: MONGO_INITDB_ROOT_PASSWORD
-      volumes:
-        - name: init-script
-          configMap:
-            name: mongo-init
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    echo "Waiting for MongoDB to be ready...";
+                    for i in {1..30}; do
+                      mongosh --eval "db.adminCommand('ping')" && break;
+                      echo "Waiting... ($i)";
+                      sleep 2;
+                    done
+                    echo "Initiating replica set...";
+                    mongosh --eval '
+                      rs.initiate({
+                        _id: "rs0",
+                        members: [
+                          { _id: 0, host: "mongo-0.mongo-headless:27017" },
+                          { _id: 1, host: "mongo-1.mongo-headless:27017" },
+                          { _id: 2, host: "mongo-2.mongo-headless:27017" }
+                        ]
+                      })
+                    '
   volumeClaimTemplates:
     - metadata:
         name: mongo-data
