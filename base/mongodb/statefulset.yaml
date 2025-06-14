@@ -14,6 +14,17 @@ spec:
       labels:
         app: mongo
     spec:
+      initContainers:
+        - name: mongo-init
+          image: bitnami/mongodb:6.0
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              sleep 10;
+              mongo --host mongo-0.mongo-headless --eval "load('/init/init.js')"
+          volumeMounts:
+            - name: init-script
+              mountPath: /init
       containers:
         - name: mongo
           image: mongo:6
@@ -33,13 +44,6 @@ spec:
                 secretKeyRef:
                   name: mongodb-secret
                   key: MONGO_INITDB_ROOT_PASSWORD
-      initContainers:
-        - name: mongo-init
-          image: mongo:6
-          command: ["mongo", "--host", "mongo-0.mongo-headless", "/init/init.js"]
-          volumeMounts:
-            - name: init-script
-              mountPath: /init
       volumes:
         - name: init-script
           configMap:
