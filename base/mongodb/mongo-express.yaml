@@ -20,7 +20,7 @@ spec:
             - containerPort: 8081
           env:
             - name: ME_CONFIG_MONGODB_SERVER
-              value: "mongo"  # or whatever your MongoDB service is called
+              value: "mongo-headless"  # or whatever your MongoDB service is called
             - name: ME_CONFIG_MONGODB_ENABLE_ADMIN
               value: "true"
             - name: ME_CONFIG_MONGODB_ADMINUSERNAME
