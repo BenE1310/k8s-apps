@@ -1,0 +1,12 @@
+# service-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-headless
+  namespace: mongodb
+spec:
+  selector:
+    app: mongo
+  ports:
+    - port: 27017
+  clusterIP: None
