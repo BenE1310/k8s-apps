@@ -23,7 +23,7 @@ spec:
               echo "Sleeping to let MongoDB start...";
               sleep 15;
               echo "Running replica set initiation...";
-              mongosh --host mongo-0.mongo-headless:27017 /init/init.js
+              mongo --host mongo-0.mongo-headless:27017 /init/init.js
           volumeMounts:
             - name: init-script
               mountPath: /init
