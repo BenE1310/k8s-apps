@@ -34,29 +34,34 @@ spec:
                   name: mongodb-secret
                   key: MONGO_INITDB_ROOT_PASSWORD
           lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/sh
-                  - -c
-                  - |
-                    echo "Waiting for MongoDB to be ready...";
-                    for i in {1..30}; do
-                      mongosh --eval "db.adminCommand('ping')" && break;
-                      echo "Waiting... ($i)";
-                      sleep 2;
-                    done
-                    echo "Initiating replica set...";
-                    mongosh --eval '
-                      rs.initiate({
-                        _id: "rs0",
-                        members: [
-                          { _id: 0, host: "mongo-0.mongo-headless:27017" },
-                          { _id: 1, host: "mongo-1.mongo-headless:27017" },
-                          { _id: 2, host: "mongo-2.mongo-headless:27017" }
-                        ]
-                      })
-                    '
+  postStart:
+    exec:
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for MongoDB to be ready...";
+          for i in {1..30}; do
+            mongosh --eval "db.adminCommand('ping')" && break;
+            echo "Waiting... ($i)";
+            sleep 2;
+          done
+          echo "Attempting replica set initiation...";
+          mongosh --eval '
+            try {
+              rs.initiate({
+                _id: "rs0",
+                members: [
+                  { _id: 0, host: "mongo-0.mongo-headless:27017" },
+                  { _id: 1, host: "mongo-1.mongo-headless:27017" },
+                  { _id: 2, host: "mongo-2.mongo-headless:27017" }
+                ]
+              });
+            } catch (e) {
+              print("Replica set initiation skipped or already initialized: " + e);
+            }
+          '
+          exit 0
   volumeClaimTemplates:
     - metadata:
         name: mongo-data
