@@ -16,14 +16,14 @@ spec:
     spec:
       initContainers:
         - name: mongo-init
-          image: mongo:6.0.13
+          image: mongo:6.0.13-jammy
           command: ["/bin/sh", "-c"]
           args:
             - |
               echo "Sleeping to let MongoDB start...";
               sleep 15;
               echo "Running replica set initiation...";
-              mongo --host mongo-0.mongo-headless:27017 /init/init.js
+              mongosh --host mongo-0.mongo-headless:27017 /init/init.js
           volumeMounts:
             - name: init-script
               mountPath: /init
