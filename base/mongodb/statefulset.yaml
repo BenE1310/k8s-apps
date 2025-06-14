@@ -16,12 +16,14 @@ spec:
     spec:
       initContainers:
         - name: mongo-init
-          image: bitnami/mongodb:6.0
+          image: mongo:6.0.13  # this image includes mongosh
           command: ["/bin/sh", "-c"]
           args:
             - |
-              sleep 10;
-              mongo --host mongo-0.mongo-headless --eval "load('/init/init.js')"
+              echo "Waiting for MongoDB to boot...";
+              sleep 15;
+              echo "Initiating replica set...";
+              mongosh --host mongo-0.mongo-headless:27017 /init/init.js
           volumeMounts:
             - name: init-script
               mountPath: /init
