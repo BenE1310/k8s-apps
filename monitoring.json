@@ -15,11 +15,8 @@
         "resourceVersion": "5697438",
         "uid": "f412e62e-989a-48ab-8309-97a32a8de917"
     },
-    "spec": {
-        "finalizers": [
-            "kubernetes"
-        ]
-    },
+    "spec": {}
+,
     "status": {
         "conditions": [
             {
