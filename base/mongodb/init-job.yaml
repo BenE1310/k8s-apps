@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongo-init
+  namespace: mongodb
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mongo-init
+          image: mongo:7.0.5
+          command:
+            - bash
+            - -c
+            - |
+              echo "Waiting for mongo-0 to become ready..."
+              until mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "db.adminCommand('ping')" >/dev/null 2>&1; do
+                sleep 2
+              done
+
+              echo "Initializing replica set..."
+              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
+                try {
+                  db = db.getSiblingDB("admin");
+                  db.auth("admin", "Aa17935!");
+
+                  cfg = {
+                    _id: "rs0",
+                    members: [
+                      { _id: 0, host: "mongo-0.mongo.mongodb.svc.cluster.local:27017" },
+                      { _id: 1, host: "mongo-1.mongo.mongodb.svc.cluster.local:27017" },
+                      { _id: 2, host: "mongo-2.mongo.mongodb.svc.cluster.local:27017" }
+                    ]
+                  };
+
+                  status = rs.status();
+                  if (!status.ok || status.codeName === "NotYetInitialized") {
+                    print("Initiating replica set...");
+                    rs.initiate(cfg);
+                  } else {
+                    print("Replica set already initialized.");
+                  }
+                } catch (e) {
+                  print("Error during replica set init: " + e);
+                }
+              '
