@@ -18,6 +18,9 @@ spec:
           image: mongo-express:latest
           ports:
             - containerPort: 8081
-          env:
-            - name: ME_CONFIG_MONGODB_URL
-              value: "mongodb://admin:Aa17935!@mongo:27017/?replicaSet=rs0"
+      env:
+        - name: ME_CONFIG_MONGODB_URL
+          value: >-
+            mongodb://admin:Aa17935!@mongo-0.mongo.mongodb.svc.cluster.local:27017,
+            mongo-1.mongo.mongodb.svc.cluster.local:27017,
+            mongo-2.mongo.mongodb.svc.cluster.local:27017/?replicaSet=rs0
