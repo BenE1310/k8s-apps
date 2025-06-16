@@ -16,7 +16,7 @@ spec:
             - |
               echo "🔄 Waiting for mongo-0 to be ready..."
               until mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "db.adminCommand('ping')" &>/dev/null; do
-                sleep 2
+                sleep 10
               done
 
               echo "🚀 Initiating replica set..."
