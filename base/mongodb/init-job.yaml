@@ -10,6 +10,17 @@ spec:
       containers:
         - name: mongo-init
           image: mongo:7.0
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_INITDB_ROOT_PASSWORD
           command:
             - bash
             - -c
@@ -35,18 +46,11 @@ spec:
                 }
               '
 
-              echo "🔐 Creating root admin user..."
-              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
-                try {
-                  use admin;
-                  db.createUser({
-                    user: "admin",
-                    pwd: "Aa17935!",
-                    roles: [ { role: "root", db: "admin" } ]
-                  });
-                  print("✅ Admin user created.");
-                } catch (e) {
-                  print("⚠️ Failed to create user (maybe already exists): " + e);
-                }
-              '
+              echo "⏳ Waiting for primary election..."
+              until mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval "JSON.stringify(rs.isMaster())" | grep -q '"ismaster":true'; do
+                sleep 2
+              done
+
+              echo "🔐 Creating root user from secret..."
+              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "db.getSiblingDB('admin').createUser({user:process.env.MONGO_INITDB_ROOT_USERNAME,pwd:process.env.MONGO_INITDB_ROOT_PASSWORD,roles:[{role:'root',db:'admin'}]})"
       restartPolicy: OnFailure
