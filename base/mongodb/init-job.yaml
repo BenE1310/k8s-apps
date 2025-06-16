@@ -14,9 +14,12 @@ spec:
             - bash
             - -c
             - |
-              echo "🔄 Waiting for mongo-0 to be ready..."
-              until mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "db.adminCommand('ping')" &>/dev/null; do
-                sleep 10
+              echo "🔄 Waiting for all MongoDB pods to be ready..."
+              for host in mongo-0 mongo-1 mongo-2; do
+                until mongosh --host $host.mongo.mongodb.svc.cluster.local --eval "db.adminCommand('ping')" &>/dev/null; do
+                  echo "⏳ Waiting for $host to be ready..."
+                  sleep 2
+                done
               done
 
               echo "🚀 Initiating replica set..."
