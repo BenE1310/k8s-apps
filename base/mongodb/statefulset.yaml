@@ -38,7 +38,6 @@ spec:
             - "--replSet"
             - rs0
             - "--bind_ip_all"
-            - "--auth"
   volumeClaimTemplates:
     - metadata:
         name: mongo-pvc
