@@ -21,13 +21,32 @@ spec:
 
               echo "🚀 Initiating replica set..."
               mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
-                rs.initiate({
-                  _id: "rs0",
-                  members: [
-                    { _id: 0, host: "mongo-0.mongo.mongodb.svc.cluster.local:27017" },
-                    { _id: 1, host: "mongo-1.mongo.mongodb.svc.cluster.local:27017" },
-                    { _id: 2, host: "mongo-2.mongo.mongodb.svc.cluster.local:27017" }
-                  ]
-                })
+                try {
+                  rs.initiate({
+                    _id: "rs0",
+                    members: [
+                      { _id: 0, host: "mongo-0.mongo.mongodb.svc.cluster.local:27017" },
+                      { _id: 1, host: "mongo-1.mongo.mongodb.svc.cluster.local:27017" },
+                      { _id: 2, host: "mongo-2.mongo.mongodb.svc.cluster.local:27017" }
+                    ]
+                  });
+                } catch (e) {
+                  print("Replica set probably already initiated.");
+                }
+              '
+
+              echo "⏳ Waiting for primary election..."
+              until mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "rs.isMaster().ismaster" | grep -q true; do
+                sleep 2
+              done
+
+              echo "🔐 Creating root user..."
+              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
+                use admin;
+                db.createUser({
+                  user: "admin",
+                  pwd: "Aa17935!",
+                  roles: [ { role: "root", db: "admin" } ]
+                });
               '
       restartPolicy: OnFailure
