@@ -31,10 +31,11 @@ spec:
               done
 
               echo "🚀 Initiating replica set (with retries)..."
-              until mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'try{ rs.initiate({_id:"rs0",members:[{_id:0,host:"mongo-0.mongo.mongodb.svc.cluster.local:27017"},{_id:1,host:"mongo-1.mongo.mongodb.svc.cluster.local:27017"},{_id:2,host:"mongo-2.mongo.mongodb.svc.cluster.local:27017"}]); }catch(e){ print(e); }' | grep -q '"ok" : 1'; do
+              until mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "rs.initiate({\"_id\":\"rs0\",\"members\":[{\"_id\":0,\"host\":\"mongo-0.mongo.mongodb.svc.cluster.local:27017\"},{\"_id\":1,\"host\":\"mongo-1.mongo.mongodb.svc.cluster.local:27017\"},{\"_id\":2,\"host\":\"mongo-2.mongo.mongodb.svc.cluster.local:27017\"}]})" | grep -q '"ok"' ; do
                 echo "⏳ Retry rs.initiate()..."
                 sleep 2
               done
+
 
               echo "⏳ Waiting for PRIMARY..."
               until [ "$(mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'rs.status().myState')" = "1" ]; do
