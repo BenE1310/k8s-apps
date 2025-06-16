@@ -10,17 +10,6 @@ spec:
       containers:
         - name: mongo-init
           image: mongo:7.0
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mongo-secret
-                  key: MONGO_INITDB_ROOT_USERNAME
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mongo-secret
-                  key: MONGO_INITDB_ROOT_PASSWORD
           command:
             - bash
             - -c
@@ -32,25 +21,13 @@ spec:
 
               echo "🚀 Initiating replica set..."
               mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
-                try {
-                  rs.initiate({
-                    _id: "rs0",
-                    members: [
-                      { _id: 0, host: "mongo-0.mongo.mongodb.svc.cluster.local:27017" },
-                      { _id: 1, host: "mongo-1.mongo.mongodb.svc.cluster.local:27017" },
-                      { _id: 2, host: "mongo-2.mongo.mongodb.svc.cluster.local:27017" }
-                    ]
-                  });
-                } catch (e) {
-                  print("Replica set probably already initiated.");
-                }
+                rs.initiate({
+                  _id: "rs0",
+                  members: [
+                    { _id: 0, host: "mongo-0.mongo.mongodb.svc.cluster.local:27017" },
+                    { _id: 1, host: "mongo-1.mongo.mongodb.svc.cluster.local:27017" },
+                    { _id: 2, host: "mongo-2.mongo.mongodb.svc.cluster.local:27017" }
+                  ]
+                })
               '
-
-              echo "⏳ Waiting for primary election..."
-              until [ "$(mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'rs.status().myState')" = "1" ]; do
-                sleep 2
-              done
-
-              echo "🔐 Creating root user from secret..."
-              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "db.getSiblingDB('admin').createUser({user:process.env.MONGO_INITDB_ROOT_USERNAME,pwd:process.env.MONGO_INITDB_ROOT_PASSWORD,roles:[{role:'root',db:'admin'}]})"
       restartPolicy: OnFailure
