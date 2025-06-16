@@ -47,7 +47,7 @@ spec:
               '
 
               echo "⏳ Waiting for primary election..."
-              until mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval "JSON.stringify(rs.isMaster())" | grep -q '"ismaster":true'; do
+              until [ "$(mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'rs.status().myState')" = "1" ]; do
                 sleep 2
               done
 
