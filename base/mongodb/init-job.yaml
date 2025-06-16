@@ -30,12 +30,21 @@ spec:
                 sleep 2
               done
 
-              echo "🚀 Initiating replica set (with retries)..."
-              until mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "rs.initiate({\"_id\":\"rs0\",\"members\":[{\"_id\":0,\"host\":\"mongo-0.mongo.mongodb.svc.cluster.local:27017\"},{\"_id\":1,\"host\":\"mongo-1.mongo.mongodb.svc.cluster.local:27017\"},{\"_id\":2,\"host\":\"mongo-2.mongo.mongodb.svc.cluster.local:27017\"}]})" | grep -q '"ok"' ; do
-                echo "⏳ Retry rs.initiate()..."
-                sleep 2
-              done
-
+              echo "🚀 Initiating replica set..."
+              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
+                try {
+                  rs.initiate({
+                    _id: "rs0",
+                    members: [
+                      { _id: 0, host: "mongo-0.mongo.mongodb.svc.cluster.local:27017" },
+                      { _id: 1, host: "mongo-1.mongo.mongodb.svc.cluster.local:27017" },
+                      { _id: 2, host: "mongo-2.mongo.mongodb.svc.cluster.local:27017" }
+                    ]
+                  });
+                } catch (e) {
+                  print("Replica set probably already initiated.");
+                }
+              '
 
               echo "⏳ Waiting for PRIMARY..."
               until [ "$(mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'rs.status().myState')" = "1" ]; do
@@ -43,6 +52,18 @@ spec:
                 sleep 2
               done
 
-              echo "🔐 Creating root admin user..."
-              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval "db.getSiblingDB('admin').createUser({user:process.env.MONGO_INITDB_ROOT_USERNAME,pwd:process.env.MONGO_INITDB_ROOT_PASSWORD,roles:[{role:'root',db:'admin'}]})"
+              echo "🔐 Creating root user..."
+              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
+                try {
+                  db = db.getSiblingDB("admin");
+                  db.createUser({
+                    user: process.env.MONGO_INITDB_ROOT_USERNAME,
+                    pwd: process.env.MONGO_INITDB_ROOT_PASSWORD,
+                    roles: [ { role: "root", db: "admin" } ]
+                  });
+                  print("✅ Root user created.");
+                } catch (e) {
+                  print("⚠️ User creation failed or already exists: " + e);
+                }
+              '
       restartPolicy: OnFailure
