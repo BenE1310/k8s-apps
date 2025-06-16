@@ -26,7 +26,7 @@ spec:
             - -c
             - |
               echo "⏳ Waiting for PRIMARY to become available..."
-              until [ "$(mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'rs.status().myState' 2>/dev/null)" = "1" ]; do
+              until mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'rs.status().members.find(m => m.stateStr === "PRIMARY")' | grep -q PRIMARY; do
                 echo "⏳ Still waiting for PRIMARY..."
                 sleep 2
               done
