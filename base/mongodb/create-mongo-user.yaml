@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-mongo-user
+  namespace: mongodb
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      containers:
+        - name: create-user
+          image: mongo:7.0
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_INITDB_ROOT_USERNAME
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_INITDB_ROOT_PASSWORD
+          command:
+            - bash
+            - -c
+            - |
+              echo "⏳ Waiting for PRIMARY to become available..."
+              until [ "$(mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval 'rs.status().myState' 2>/dev/null)" = "1" ]; do
+                echo "⏳ Still waiting for PRIMARY..."
+                sleep 2
+              done
+
+              echo "🔐 Creating root user..."
+              mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
+                try {
+                  db = db.getSiblingDB("admin");
+                  db.createUser({
+                    user: process.env.MONGO_INITDB_ROOT_USERNAME,
+                    pwd: process.env.MONGO_INITDB_ROOT_PASSWORD,
+                    roles: [ { role: "root", db: "admin" } ]
+                  });
+                  print("✅ Root user created.");
+                } catch (e) {
+                  print("⚠️ User creation failed or already exists: " + e);
+                }
+              '
+      restartPolicy: OnFailure
