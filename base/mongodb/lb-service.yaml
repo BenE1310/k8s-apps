@@ -8,7 +8,24 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    statefulset.kubernetes.io/pod-name: mongo-0  # ⬅️ Change this when PRIMARY changes
+    statefulset.kubernetes.io/pod-name: mongo-1  # ⬅️ Change this when PRIMARY changes
   ports:
     - port: 27017
       targetPort: 27017
+
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mongo-lb
+#   namespace: mongodb
+#   labels:
+#     app: mongo
+# spec:
+#   type: LoadBalancer
+#   ports:
+#     - name: mongo
+#       port: 27017
+#       targetPort: 27017
+#   selector:
+#     app: mongo
