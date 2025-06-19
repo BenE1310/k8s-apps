@@ -43,7 +43,7 @@ spec:
         name: mongo-pvc
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: local-path
+        storageClassName: local-path-retain
         resources:
           requests:
-            storage: 5Gi
+            storage: 1Gi
