@@ -1,2 +1,12 @@
 resources:
-  - pv-recovery
+  - namespace.yaml
+  - pv-recovery/pv-patch-sa.yaml
+  - pv-recovery/patch-mongo-pv-job.yaml
+  - sealed-mongo-user-secret.yaml
+  - service.yaml
+  - statefulset.yaml
+  - lb-service.yaml
+  - create-mongo-user.yaml
+  - init-job.yaml
+  - mongo-export-deployment.yaml
+  - mongo-export-service.yaml
