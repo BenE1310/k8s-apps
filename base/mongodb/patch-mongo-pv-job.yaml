@@ -5,23 +5,24 @@ metadata:
   namespace: mongodb
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
-  backoffLimit: 2
   template:
     spec:
       serviceAccountName: pv-patch-sa
       containers:
-        - name: pv-patcher
+        - name: patcher
           image: bitnami/kubectl:latest
           command:
-            - /bin/sh
+            - sh
             - -c
             - |
-              echo "🔍 Scanning for Released Mongo PVs..."
-              for pv in $(kubectl get pv -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.claimRef.namespace}{"\t"}{.spec.claimRef.name}{"\t"}{.status.phase}{"\n"}{end}' | grep '^pvc' | grep 'mongodb' | grep 'Released' | awk '{print $1}'); do
-                echo "🛠️ Patching PV $pv..."
-                kubectl patch pv $pv -p '{"spec":{"claimRef": null}}'
+              for pv in $(kubectl get pv -o jsonpath='{range .items[?(@.spec.claimRef.name=="mongo-pvc-mongo-0" || @.spec.claimRef.name=="mongo-pvc-mongo-1" || @.spec.claimRef.name=="mongo-pvc-mongo-2")]}{.metadata.name}{"\n"}{end}' | grep -v '^$'); do
+                status=$(kubectl get pv $pv -o jsonpath='{.status.phase}')
+                if [ "$status" = "Released" ]; then
+                  echo "Patching PV: $pv"
+                  kubectl patch pv $pv -p '{"spec":{"claimRef": null}}'
+                fi
               done
       restartPolicy: OnFailure

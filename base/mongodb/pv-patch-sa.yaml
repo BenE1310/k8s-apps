@@ -4,26 +4,32 @@ metadata:
   name: pv-patch-sa
   namespace: mongodb
   annotations:
-  argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/sync-wave: "0"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
-  name: patch-pv-role
+  name: pv-patch-role
+  namespace: mongodb
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 rules:
   - apiGroups: [""]
     resources: ["persistentvolumes"]
     verbs: ["get", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
-  name: patch-pv-role-binding
+  name: pv-patch-rolebinding
+  namespace: mongodb
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 subjects:
   - kind: ServiceAccount
     name: pv-patch-sa
     namespace: mongodb
 roleRef:
-  kind: ClusterRole
-  name: patch-pv-role
+  kind: Role
+  name: pv-patch-role
   apiGroup: rbac.authorization.k8s.io
