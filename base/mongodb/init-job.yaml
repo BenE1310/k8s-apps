@@ -22,6 +22,14 @@ spec:
                 done
               done
 
+              echo "🔍 Checking if replica set already exists..."
+              REPLICA_OK=$(mongosh --quiet --host mongo-0.mongo.mongodb.svc.cluster.local --eval "try { rs.status().ok } catch (e) { 0 }")
+
+              if [ "$REPLICA_OK" = "1" ]; then
+                echo "✅ Replica set already exists. Skipping initialization."
+                exit 0
+              fi
+
               echo "🚀 Initiating replica set..."
               mongosh --host mongo-0.mongo.mongodb.svc.cluster.local --eval '
                 rs.initiate({
