@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keepass-app-service
+  namespace: keepass
+spec:
+  selector:
+    app: keepass
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3001
+  type: LoadBalancer
+  loadBalancerIP: 172.16.10.210
+  
+
+
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mongo-lb
+#   namespace: mongodb
+#   labels:
+#     app: mongo
+# spec:
+#   type: LoadBalancer
+#   ports:
+#     - name: mongo
+#       port: 27017
+#       targetPort: 27017
+#   selector:
+#     app: mongo
