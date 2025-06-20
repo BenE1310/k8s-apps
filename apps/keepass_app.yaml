@@ -11,7 +11,7 @@ spec:
     path: base/keepass
   destination:
     server: https://kubernetes.default.svc
-    namespace: keepass
+    namespace: keepass_app
   syncPolicy:
     automated:
       prune: true
