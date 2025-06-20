@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: redis
+  name: keepass
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/bene1310/k8s-apps
     targetRevision: HEAD
-    path: base/redis
+    path: base/keepass
   destination:
     server: https://kubernetes.default.svc
-    namespace: redis-lab
+    namespace: keepass
   syncPolicy:
     automated:
       prune: true
