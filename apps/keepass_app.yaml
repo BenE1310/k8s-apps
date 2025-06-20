@@ -8,10 +8,10 @@ spec:
   source:
     repoURL: https://github.com/bene1310/k8s-apps
     targetRevision: HEAD
-    path: base/keepass
+    path: base/keepass_app
   destination:
     server: https://kubernetes.default.svc
-    namespace: keepass_app
+    namespace: keepass
   syncPolicy:
     automated:
       prune: true
