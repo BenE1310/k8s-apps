@@ -10,7 +10,7 @@ data:
     groups:
       - name: Alerts
         rules:
-          - alert: Is Node Exporter Up
+          - alert: Is Node Exporter Up?
             expr: up{job="wmi_exporter"} == 0
             for: 10s
             labels:
