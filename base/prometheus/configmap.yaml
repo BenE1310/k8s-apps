@@ -26,3 +26,5 @@ data:
         static_configs:
           - targets:
               - 172.16.10.108:9182
+    rule_files:
+      - "/etc/prometheus/rules/alerts.yml"

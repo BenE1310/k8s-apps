@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-rules
+  namespace: prometheus
+  labels:
+    role: alert-rules
+data:
+  alerts.yml: |
+    groups:
+      - name: Alerts
+        rules:
+          - alert: Is Node Exporter Up
+            expr: up{job="wmi_exporter"} == 0
+            for: 15s
+            labels:
+              severity: critical
+            annotations:
+              summary: "Node Exporter is down"
+              description: "Instance {{ $labels.instance }} is unreachable for more than 15 seconds."
