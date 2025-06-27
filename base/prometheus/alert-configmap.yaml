@@ -10,11 +10,12 @@ data:
     groups:
       - name: Alerts
         rules:
-          - alert: Is Node Exporter Up
+          - alert: Is wmi exporter Up?
             expr: up{job="wmi_exporter"} == 0
-            for: 15s
+            for: 0m
             labels:
-              severity: critical
+            team: Gekko
+              severity: Critical
             annotations:
-              summary: "Node Exporter is down"
-              description: "Instance {{ $labels.instance }} is unreachable for more than 15 seconds."
+              summary: "{{ $labels.instance }} is down"
+              description: "Instance {{ $labels.instance }} is unreachable Habibi."
