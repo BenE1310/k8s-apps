@@ -12,9 +12,10 @@ data:
         rules:
           - alert: Is Node Exporter Up
             expr: up{job="wmi_exporter"} == 0
-            for: 0m
+            for: 10s
             labels:
+              team: Gekko
               severity: critical
             annotations:
-              summary: "Node Exporter is down"
-              description: "Instance {{ $labels.instance }} is unreachable for more than 15 seconds."
+              summary: "{{ $labels.instance }} is down"
+              description: "Instance {{ $labels.instance }} is unreachable for more than 10 seconds."
