@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: alertmanager
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BenE1310/k8s-apps.git
+    targetRevision: HEAD
+    path: base/prometheus/alertmanager
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prometheus
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
