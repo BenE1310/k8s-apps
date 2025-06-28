@@ -12,7 +12,7 @@ data:
       smtp_smarthost: 'smtp.gmail.com:587'
       smtp_from: 'benyamine1310@gmail.com'
       smtp_auth_username: 'benyamine1310@gmail.com'
-      smtp_auth_password: 'mypasssword'
+      smtp_auth_password: 'lvkzgcsaqlagydnr'
       smtp_require_tls: true
 
     route:
