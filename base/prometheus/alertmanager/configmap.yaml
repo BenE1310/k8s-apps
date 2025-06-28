@@ -15,23 +15,19 @@ data:
       smtp_require_tls: true
 
     route:
-      receiver: 'default'   # fallback
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 1h
+      receiver: main_receiver
+
 
       routes:
-        - matchers:
-            - severity = "critical"
           receiver: 'urgent_receiver'
+        - matchers:
+            - severity="critical"
 
     receivers:
-      - name: 'default'
+      - name: 'main_receiver'
         email_configs:
           - to: 'beneytan5@gmail.com'
-            send_resolved: true
 
       - name: 'urgent_receiver'
         email_configs:
           - to: 'beneytan5@gmail.com'
-            send_resolved: true
