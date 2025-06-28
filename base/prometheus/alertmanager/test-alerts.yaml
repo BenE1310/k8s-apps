@@ -3,6 +3,8 @@ kind: PrometheusRule
 metadata:
   name: test-alert-rule
   namespace: prometheus
+  labels:
+    release: prometheus
 spec:
   groups:
     - name: always-firing
@@ -13,5 +15,4 @@ spec:
           labels:
             severity: critical
           annotations:
-            summary: "This is a test alert"
-            description: "This alert always fires to test email delivery"
+            summary: "Test alert from Prometheus"
