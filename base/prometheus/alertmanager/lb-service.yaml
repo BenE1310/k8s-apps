@@ -1,15 +1,16 @@
-# alertmanager-service.yaml
+# alertmanager-lb.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: alertmanager
+  name: alertmanager-lb
   namespace: prometheus
 spec:
   selector:
     app: alertmanager
   ports:
-    - protocol: TCP
+    - name: web
+      protocol: TCP
       port: 80
       targetPort: 9093
   type: LoadBalancer
-  loadBalancerIP: 172.16.10.207
+  loadBalancerIP: 172.16.10.207  # your MetalLB IP
