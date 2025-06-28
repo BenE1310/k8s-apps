@@ -1,4 +1,3 @@
-# This ConfigMap contains the configuration for Alertmanager.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -16,14 +15,22 @@ data:
       smtp_require_tls: true
 
     route:
-      receiver: 'urgent_receiver'
+      receiver: 'default'   # fallback
       group_wait: 30s
       group_interval: 5m
       repeat_interval: 1h
-      matchers:
-        - severity = "critical"
+
+      routes:
+        - matchers:
+            - severity = "critical"
+          receiver: 'urgent_receiver'
 
     receivers:
+      - name: 'default'
+        email_configs:
+          - to: 'beneytan5@gmail.com'
+            send_resolved: true
+
       - name: 'urgent_receiver'
         email_configs:
           - to: 'beneytan5@gmail.com'
