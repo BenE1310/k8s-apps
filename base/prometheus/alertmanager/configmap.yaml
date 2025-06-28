@@ -12,13 +12,16 @@ data:
       smtp_smarthost: 'smtp.gmail.com:587'
       smtp_from: 'benyamine1310@gmail.com'
       smtp_auth_username: 'benyamine1310@gmail.com'
-      smtp_auth_password: 'lvkzgcsaqlagydnr'
+      smtp_auth_password: 'mypasssword'
+      smtp_require_tls: true
+
     route:
-      receiver: 'default'
+      receiver: 'urgent_receiver'
       matchers:
-        - severity = critical
+        - severity = "critical"
 
     receivers:
       - name: 'urgent_receiver'
         email_configs:
           - to: 'beneytan5@gmail.com'
+            send_resolved: true
