@@ -28,3 +28,9 @@ data:
               - 172.16.10.108:9182
     rule_files:
       - "/etc/prometheus/rules/alerts.yml"
+      
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+                - alertmanager.prometheus.svc:9093
