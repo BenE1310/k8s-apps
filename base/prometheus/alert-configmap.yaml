@@ -8,14 +8,26 @@ metadata:
 data:
   alerts.yml: |
     groups:
-      - name: Alerts
+      - name: always-firing
         rules:
-          - alert: Is Node Exporter Up?
-            expr: up{job="wmi_exporter"} == 0
+          - alert: AlwaysFiring
+            expr: vector(1)
             for: 10s
             labels:
               severity: critical
-              team: Gekko
             annotations:
-              description: Instance {{ $labels.instance }} is unreachable for more than 10 seconds.
-              summary: "{{ $labels.instance }} is down"
+              summary: "Test Alert"
+  # alerts.yml: |
+  #   groups:
+  #     - name: Alerts
+  #       rules:
+  #         - alert: Is Node Exporter Up?
+  #           expr: up{job="wmi_exporter"} == 0
+  #           for: 10s
+  #           labels:
+  #             severity: critical
+  #             team: Gekko
+  #           annotations:
+  #             description: Instance {{ $labels.instance }} is unreachable for more than 10 seconds.
+  #             summary: "{{ $labels.instance }} is down"
+
