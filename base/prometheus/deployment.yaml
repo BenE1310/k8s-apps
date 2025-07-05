@@ -23,15 +23,12 @@ spec:
             - containerPort: 9090
           volumeMounts:
             - name: config-volume
-              mountPath: /etc/prometheus/config/prometheus.yml
-              subPath: prometheus.yml
+              mountPath: /etc/prometheus/
             - name: rules-volume
-              mountPath: /etc/prometheus/rules/alerts.yml
-              subPath: alerts.yml
+              mountPath: /etc/prometheus/rules/
               readOnly: true
             - name: recording-rules-volume
-              mountPath: /etc/prometheus/rules/recording.yml
-              subPath: recording.yml
+              mountPath: /etc/prometheus/rules/
               readOnly: true
       volumes:
         - name: config-volume
