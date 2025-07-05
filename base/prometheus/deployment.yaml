@@ -28,9 +28,6 @@ spec:
               mountPath: /etc/prometheus/rules/
               readOnly: true
       volumes:
-        - name: config-volume
-          configMap:
-            name: prometheus-config
         - name: rules-volume
           configMap:
-            name: prometheus-rules
+            name: prometheus-all-rules

@@ -19,12 +19,3 @@ data:
             annotations:
               description: Instance {{ $labels.instance }} is unreachable for more than 10 seconds.
               summary: "{{ $labels.instance }} is down"
-              
-  # recording_rules.yml: | 
-  #   groups:
-  #     - name: node exporter
-  #       rules:
-  #         - record: cpu:node_cpu_seconds_total
-  #         expr: avg by(cpu) (rate(node_cpu_seconds_total[1m]))
-  #         labels:
-  #           exporter_name: node
