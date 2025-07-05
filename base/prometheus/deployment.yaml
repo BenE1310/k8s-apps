@@ -27,9 +27,6 @@ spec:
             - name: rules-volume
               mountPath: /etc/prometheus/rules/
               readOnly: true
-            - name: recording-rules-volume
-              mountPath: /etc/prometheus/rules/
-              readOnly: true
       volumes:
         - name: config-volume
           configMap:
@@ -37,6 +34,3 @@ spec:
         - name: rules-volume
           configMap:
             name: prometheus-rules
-        - name: recording-rules-volume
-          configMap:
-            name: prometheus-recording-rules
