@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: storage
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -25,7 +30,8 @@ spec:
         - sh
         - -c
         - |
-          npm install express multer minio cors
+          echo '{"name":"upload-service","version":"1.0.0","main":"server.js","dependencies":{"express":"^4.18.2","multer":"^1.4.5-lts.1","minio":"^7.1.1","cors":"^2.8.5"}}' > package.json
+          npm install
           node server.js
         volumeMounts:
         - name: app-code
@@ -71,11 +77,14 @@ data:
     const multer = require('multer');
     const Minio = require('minio');
     const cors = require('cors');
-    const path = require('path');
 
     const app = express();
     app.use(cors());
     app.use(express.json());
+
+    console.log('Starting upload service...');
+    console.log('MinIO Endpoint:', process.env.MINIO_ENDPOINT);
+    console.log('MinIO Port:', process.env.MINIO_PORT);
 
     // Configure MinIO client
     const minioClient = new Minio.Client({
@@ -105,14 +114,21 @@ data:
       }
     });
 
+    // Health check endpoint
+    app.get('/health', (req, res) => {
+      res.json({ status: 'OK', timestamp: new Date().toISOString() });
+    });
+
     // Upload endpoint
     app.post('/upload', upload.single('image'), async (req, res) => {
       try {
+        console.log('Upload request received');
         if (!req.file) {
           return res.status(400).json({ error: 'No file uploaded' });
         }
 
         const fileName = `profile_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+        console.log('Uploading file:', fileName);
         
         // Upload to MinIO
         await minioClient.putObject(
@@ -123,6 +139,7 @@ data:
           { 'Content-Type': req.file.mimetype }
         );
 
+        console.log('File uploaded successfully');
         res.json({ 
           success: true, 
           filename: fileName,
@@ -130,7 +147,7 @@ data:
         });
       } catch (error) {
         console.error('Upload error:', error);
-        res.status(500).json({ error: 'Upload failed' });
+        res.status(500).json({ error: 'Upload failed', details: error.message });
       }
     });
 
@@ -138,6 +155,7 @@ data:
     app.get('/images/:filename', async (req, res) => {
       try {
         const fileName = req.params.filename;
+        console.log('Downloading file:', fileName);
         const stream = await minioClient.getObject(bucketName, fileName);
         res.setHeader('Content-Type', 'image/jpeg');
         stream.pipe(res);
@@ -151,6 +169,7 @@ data:
     app.delete('/images/:filename', async (req, res) => {
       try {
         const fileName = req.params.filename;
+        console.log('Deleting file:', fileName);
         await minioClient.removeObject(bucketName, fileName);
         res.json({ success: true });
       } catch (error) {
