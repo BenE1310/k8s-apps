@@ -10,7 +10,6 @@ spec:
     path: base/minio
   destination:
     server: https://kubernetes.default.svc
-    namespace: minio
   syncPolicy:
     automated:
       prune: true
