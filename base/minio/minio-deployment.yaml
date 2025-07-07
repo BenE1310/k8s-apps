@@ -70,7 +70,6 @@ spec:
     targetPort: 9001
     name: console
   type: LoadBalancer
-  loadBalancerIP: "172.16.10.243"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
