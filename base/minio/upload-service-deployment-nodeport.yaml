@@ -32,9 +32,9 @@ spec:
           mountPath: /app
         env:
         - name: MINIO_ENDPOINT
-          value: "172.16.10.243"
+          value: "YOUR_K3S_NODE_IP"  # Replace with your K3s node IP
         - name: MINIO_PORT
-          value: "9000"
+          value: "30900"  # NodePort for MinIO API
         - name: MINIO_ACCESS_KEY
           value: "admin"
         - name: MINIO_SECRET_KEY
@@ -51,15 +51,14 @@ kind: Service
 metadata:
   name: upload-service
   namespace: storage
-  annotations:
-    metallb.universe.tf/address-pool: default
 spec:
   selector:
     app: upload-service
   ports:
   - port: 3000
     targetPort: 3000
-  type: LoadBalancer
+    nodePort: 30300
+  type: NodePort
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -127,7 +126,7 @@ data:
         res.json({ 
           success: true, 
           filename: fileName,
-          url: `http://172.16.10.243:9000/${bucketName}/${fileName}`
+          url: `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${bucketName}/${fileName}`
         });
       } catch (error) {
         console.error('Upload error:', error);

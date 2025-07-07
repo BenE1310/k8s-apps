@@ -57,8 +57,6 @@ kind: Service
 metadata:
   name: minio-service
   namespace: storage
-  annotations:
-    metallb.universe.tf/address-pool: default
 spec:
   selector:
     app: minio
@@ -66,10 +64,12 @@ spec:
   - port: 9000
     targetPort: 9000
     name: api
+    nodePort: 30900
   - port: 9001
     targetPort: 9001
     name: console
-  type: LoadBalancer
+    nodePort: 30901
+  type: NodePort
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
