@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: upload-service
-  namespace: minio
+  namespace: storage
   labels:
     app: upload-service
 spec:
@@ -28,7 +28,7 @@ spec:
           npm install express multer minio cors
           node server.js
         volumeMounts:
-        - name: app-code  
+        - name: app-code
           mountPath: /app
         env:
         - name: MINIO_ENDPOINT
@@ -50,7 +50,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: upload-service
-  namespace: minio
+  namespace: storage
   annotations:
     metallb.universe.tf/address-pool: default
 spec:
@@ -66,7 +66,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: upload-service-config
-  namespace: minio
+  namespace: storage
 data:
   server.js: |
     const express = require('express');

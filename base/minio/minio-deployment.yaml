@@ -1,8 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: storage
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: minio
-  namespace: minio
+  namespace: storage
   labels:
     app: minio
 spec:
@@ -51,7 +56,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: minio-service
-  namespace: minio
+  namespace: storage
   annotations:
     metallb.universe.tf/address-pool: default
 spec:
@@ -71,7 +76,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: minio-pvc
-  namespace: minio
+  namespace: storage
 spec:
   accessModes:
     - ReadWriteOnce
@@ -83,6 +88,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: minio-config
-  namespace: minio
+  namespace: storage
 data:
   bucket: "profile-images" 
