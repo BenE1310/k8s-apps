@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/BenE1310/k8s-apps.git
     targetRevision: HEAD
-    path: minio
+    path: base/minio
   destination:
     server: https://kubernetes.default.svc
     namespace: minio
