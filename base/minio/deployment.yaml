@@ -28,7 +28,7 @@ spec:
             - name: MINIO_ROOT_USER
               value: "admin"
             - name: MINIO_ROOT_PASSWORD
-              value: "supersecret123"
+              value: "Aa17935!"
           volumeMounts:
             - name: data
               mountPath: /data
