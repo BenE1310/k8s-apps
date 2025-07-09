@@ -26,6 +26,12 @@ data:
         static_configs:
           - targets:
               - 172.16.10.108:9182
+
+      - job_name: 'python'
+      static_configs:
+        - targets:
+            - 172.16.10.108:8000
+      
     rule_files:
       - "/etc/prometheus/rules/alerts.yml"
       - "/etc/prometheus/rules/recording_rules.yml"
