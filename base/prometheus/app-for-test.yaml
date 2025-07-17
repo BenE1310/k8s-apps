@@ -19,6 +19,6 @@ spec:
     spec:
       containers:
         - name: flask-metrics
-          image: bene1310/sample-flask-app:v1.0.0
+          image: bene1310/sample-flask-app:v1.0.1
           ports:
             - containerPort: 8000
