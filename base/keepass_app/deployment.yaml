@@ -14,9 +14,6 @@ spec:
     metadata:
       labels:
         app: keepass
-    annotations:
-      prometheus.io/scrape: "true"
-      prometheus.io/port: "3001"
     spec:
       containers:
         - name: keepassecure
