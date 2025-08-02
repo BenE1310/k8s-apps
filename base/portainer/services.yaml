@@ -9,6 +9,7 @@ spec:
     app: portainer
   ports:
     - protocol: TCP
-      port: 9443
-      targetPort: 9000
+      port: 80
+      targetPort: 9000  # Portainer's default port
   LoadBalancerIP: 172.16.10.205
+  
