@@ -15,6 +15,7 @@ rules:
       - persistentvolumes
       - persistentvolumeclaims
       - resourcequotas    # 👈 Add this line
+      - events
     verbs: ["get", "list", "watch"]
 
   - apiGroups: ["apps"]
