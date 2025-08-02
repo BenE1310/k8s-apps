@@ -14,4 +14,4 @@ spec:
       port: 9001
       targetPort: 9001
   type: LoadBalancer
-  loadBalancerIP: 172.16.10.250  # Use your MetalLB range
+  loadBalancerIP: 172.16.10.250 
