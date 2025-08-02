@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/bene1310/k8s-apps
+    repoURL: https://github.com/BenE1310/k8s-apps.git
     targetRevision: HEAD
     path: base/portainer
   destination:
@@ -14,5 +14,5 @@ spec:
     namespace: portainer
   syncPolicy:
     automated:
-      prune: true
       selfHeal: true
+      prune: true
