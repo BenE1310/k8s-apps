@@ -1,0 +1,9 @@
+---
+# Dedicated namespace for Kirtus project
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kirtus
+  labels:
+    name: kirtus
+    project: event-tickets

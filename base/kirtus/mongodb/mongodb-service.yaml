@@ -1,0 +1,39 @@
+---
+# MongoDB Service (ClusterIP) - for internal access
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-kirtus
+  namespace: kirtus
+  labels:
+    app: mongodb-kirtus
+spec:
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+    protocol: TCP
+    name: mongodb
+  selector:
+    app: mongodb-kirtus
+
+---
+# MongoDB Service (LoadBalancer) - for external access with fixed IP
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-kirtus-external
+  namespace: kirtus
+  labels:
+    app: mongodb-kirtus
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 172.16.10.201  # Change to your desired IP
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 27017
+    targetPort: 27017
+    protocol: TCP
+    name: mongodb
+  selector:
+    app: mongodb-kirtus
