@@ -18,21 +18,21 @@ spec:
     app: mongodb-kirtus
 
 ---
-# MongoDB Service (LoadBalancer) - for external access with fixed IP
+# MongoDB Service (NodePort) - for external access via node IP
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb-kirtus-external
+  name: mongodb-kirtus-nodeport
   namespace: kirtus
   labels:
     app: mongodb-kirtus
 spec:
-  type: LoadBalancer
-  ports:
-  - port: 27017
-    targetPort: 27017
-    protocol: TCP
-    name: mongodb
+  type: NodePort
   selector:
     app: mongodb-kirtus
-  loadBalancerIP: 172.16.10.201
+  ports:
+  - name: mongodb
+    port: 27017
+    targetPort: 27017
+    protocol: TCP
+    nodePort: 32017
