@@ -17,7 +17,7 @@ spec:
         kubernetes.io/hostname: node01  # ← Pin to node01
       containers:
         - name: postgres
-          image: postgres:16-alpine
+          image: registry.k8s.io/postgres:16-alpine
           ports:
             - containerPort: 5432
           envFrom:
