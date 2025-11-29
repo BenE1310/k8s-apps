@@ -3,12 +3,11 @@ kind: Service
 metadata:
   name: postgres
   namespace: postgres
-  annotations:
-    metallb.universe.tf/loadBalancerIPs: 172.16.10.206
 spec:
   selector:
     app: postgres
   ports:
     - port: 5432
       targetPort: 5432
-  type: LoadBalancer
+      nodePort: 30432
+  type: NodePort
