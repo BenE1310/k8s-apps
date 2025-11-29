@@ -10,11 +10,13 @@ rules:
       - endpoints
       - nodes
       - namespaces
+      - namespaces/status
       - configmaps
       - secrets
       - persistentvolumes
       - persistentvolumeclaims
-      - resourcequotas    # 👈 Add this line
+      - persistentvolumeclaims/status
+      - resourcequotas
       - events
     verbs: ["get", "list", "watch"]
 
@@ -39,14 +41,16 @@ rules:
     verbs: ["get", "list", "watch"]
 
   - apiGroups: ["autoscaling"]
-    resources: ["horizontalpodautoscalers"]
+    resources:
+      - horizontalpodautoscalers
     verbs: ["get", "list", "watch"]
 
-  # Add this block for IngressClasses
   - apiGroups: ["networking.k8s.io"]
-    resources: ["ingressclasses"]
+    resources:
+      - ingressclasses
     verbs: ["get", "list", "watch"]
 
   - apiGroups: ["storage.k8s.io"]
-    resources: ["storageclasses"]
+    resources:
+      - storageclasses
     verbs: ["get", "list", "watch"]
