@@ -20,6 +20,6 @@ spec:
             - containerPort: 80
           env:
             - name: PGADMIN_DEFAULT_EMAIL
-              value: "pgadmin"
+              value: "pgadmin@admin.com"
             - name: PGADMIN_DEFAULT_PASSWORD
               value: "Aa17935!"
