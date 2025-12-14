@@ -1,0 +1,2 @@
+# check range of metalLB IPs
+kubectl get ipaddresspool -n metallb-system -o yaml
