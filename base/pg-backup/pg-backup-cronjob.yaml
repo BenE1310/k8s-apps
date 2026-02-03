@@ -1,0 +1,92 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-daily-backup
+  namespace: postgres
+spec:
+  schedule: "0 2 * * *"
+  timeZone: "Asia/Jerusalem"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: postgres:16
+              command: ["/bin/bash", "-lc"]
+              args:
+                - |
+                  set -euo pipefail
+
+                  # ---- Static connection target ----
+                  PGHOST="postgres.postgres.svc.cluster.local"
+                  PGPORT="5432"
+
+                  # ---- Read credentials from mounted secret (supports many key names) ----
+                  S="/secrets/postgres"
+
+                  pick() {
+                    for k in "$@"; do
+                      if [ -f "$S/$k" ]; then
+                        cat "$S/$k"
+                        return 0
+                      fi
+                    done
+                    return 1
+                  }
+
+                  PGPASSWORD="$(pick PGPASSWORD POSTGRES_PASSWORD postgres-password password pg_password || true)"
+                  if [ -z "${PGPASSWORD}" ]; then
+                    echo "ERROR: Could not find password in secret volume $S"
+                    echo "Keys present:"
+                    ls -la "$S" || true
+                    exit 1
+                  fi
+
+                  PGUSER="$(pick PGUSER POSTGRES_USER postgres-user username user || true)"
+                  PGUSER="${PGUSER:-postgres}"
+
+                  PGDATABASE="$(pick PGDATABASE POSTGRES_DB database dbname db || true)"
+                  PGDATABASE="${PGDATABASE:-postgres}"
+
+                  export PGHOST PGPORT PGUSER PGDATABASE PGPASSWORD
+
+                  echo "Connecting to: $PGHOST:$PGPORT  DB=$PGDATABASE  USER=$PGUSER"
+
+                  # ---- One stable file per day (UTC) + atomic write ----
+                  DAY="$(date -u +%F)"
+                  OUT="/backups/${PGDATABASE}_${DAY}.sql.gz"
+                  TMP="/backups/.${PGDATABASE}_${DAY}.sql.gz.tmp"
+
+                  cleanup() { rm -f "$TMP"; }
+                  trap cleanup EXIT
+
+                  echo "Starting backup -> $OUT"
+                  pg_dump -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" "$PGDATABASE" | gzip > "$TMP"
+                  mv -f "$TMP" "$OUT"
+
+                  trap - EXIT
+
+                  echo "Retention: delete backups older than 14 days..."
+                  find /backups -type f -name "${PGDATABASE}_*.sql.gz" -mtime +14 -delete || true
+
+                  echo "Backup done."
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+                - name: postgres-secret-vol
+                  mountPath: /secrets/postgres
+                  readOnly: true
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: pg-backup-pvc
+            - name: postgres-secret-vol
+              secret:
+                secretName: postgres-secret

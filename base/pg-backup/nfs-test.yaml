@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nfs-test
+  namespace: postgres
+spec:
+  containers:
+    - name: test
+      image: busybox
+      command: ["sh","-c","echo hello-from-k8s > /mnt/hello.txt && sleep 3600"]
+      volumeMounts:
+        - name: backups
+          mountPath: /mnt
+  volumes:
+    - name: backups
+      persistentVolumeClaim:
+        claimName: pg-backup-pvc
