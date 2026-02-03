@@ -58,10 +58,16 @@ spec:
               value: "0"
               
             - name: ME_CONFIG_BASICAUTH_USERNAME
-              value: ""
-              
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-express-ui-secret
+                  key: username
+            
             - name: ME_CONFIG_BASICAUTH_PASSWORD
-              value: ""
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-express-ui-secret
+                  key: password
 
             - name: ME_CONFIG_SITE_SESSIONSECRET
               value: "changeme-session-secret"
