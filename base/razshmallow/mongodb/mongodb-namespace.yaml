@@ -1,0 +1,9 @@
+---
+# Dedicated namespace for Razshmallow project
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: razshmallow
+  labels:
+    name: razshmallow
+    project: razshmallow

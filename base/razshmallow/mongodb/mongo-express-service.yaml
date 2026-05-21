@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express
+  namespace: razshmallow
+spec:
+  type: LoadBalancer
+  selector:
+    app: mongo-express
+  ports:
+    - port: 80
+      targetPort: 8081
+  # Adjust to a free IP in your lab's MetalLB pool.
+  # Kirtus is using 172.16.10.202.
+  loadBalancerIP: 172.16.10.203
