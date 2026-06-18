@@ -1,0 +1,32 @@
+# Non-secret backend config. Secrets (Mongo URI, JWT, SMTP pass, MinIO keys)
+# live in the Secret (see secret.example.yaml) — NOT here, NOT in git.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: razshmallow-backend-config
+  namespace: razshmallow
+  labels:
+    app: razshmallow-backend
+    project: razshmallow
+data:
+  NODE_ENV: "production"
+  PORT: "4000"
+  # Same-origin in prod (frontend + API both on razshmallow.site via the tunnel).
+  CORS_ORIGIN: "https://razshmallow.site"
+  JWT_EXPIRES_IN: "7d"
+  # 0 = send real OTP/notification email (Gmail relay has a daily cap — mind load).
+  # Set to 1 to disable outbound mail (codes print to the pod log instead).
+  MAIL_DISABLE: "0"
+  STORAGE_PROVIDER: "minio"
+  MAX_UPLOAD_BYTES: "26214400"
+  # In-cluster MinIO (namespace minio, service minio).
+  MINIO_ENDPOINT: "minio.minio.svc.cluster.local"
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  MINIO_BUCKET: "razshmallow-attachments"
+  MINIO_REGION: "us-east-1"
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "465"
+  SMTP_SECURE: "true"
+  SMTP_FROM_NAME: "Razshmallow"
+  SMTP_FROM_ADDRESS: "mprestintegration@gmail.com"

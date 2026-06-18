@@ -1,0 +1,21 @@
+# ArgoCD Application for the Razshmallow app (frontend + backend + cloudflared).
+# Mirrors the existing apps/razshmallow-mongodb.yaml convention. The root-app
+# (apps/root-app.yaml) watches the apps/ folder and will pick this up.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: razshmallow-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/bene1310/k8s-apps
+    path: base/razshmallow/app
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: razshmallow
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: razshmallow-frontend
+  namespace: razshmallow
+  labels:
+    app: razshmallow-frontend
+    project: razshmallow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: razshmallow-frontend
+  template:
+    metadata:
+      labels:
+        app: razshmallow-frontend
+        project: razshmallow
+    spec:
+      containers:
+        - name: frontend
+          image: docker.io/bene1310/razshmallow-frontend:1.0.0
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "20m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: razshmallow-frontend
+  namespace: razshmallow
+  labels:
+    app: razshmallow-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: razshmallow-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
