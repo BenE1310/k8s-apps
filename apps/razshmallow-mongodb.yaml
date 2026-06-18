@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: razshmallow
+  name: razshmallow-mongodb
   namespace: argocd
 spec:
   project: default
