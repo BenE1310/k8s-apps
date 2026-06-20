@@ -13,6 +13,10 @@ data:
   PORT: "4000"
   # Same-origin in prod (frontend + API both on razshmallow.site via the tunnel).
   CORS_ORIGIN: "https://razshmallow.site"
+  # Base URL for links in outbound email (e.g. invitation links). Must be the real
+  # frontend origin — CORS_ORIGIN can't stand in for it (it's "*" in dev). Defaults
+  # to http://localhost:5173 if unset, which would point invite links at localhost.
+  APP_URL: "https://razshmallow.site"
   JWT_EXPIRES_IN: "7d"
   # 0 = send real OTP/notification email (Gmail relay has a daily cap — mind load).
   # Set to 1 to disable outbound mail (codes print to the pod log instead).
