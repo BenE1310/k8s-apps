@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: docker.io/bene1310/razshmallow-frontend:1.0.13
+          image: docker.io/bene1310/razshmallow-frontend:1.0.14
           ports:
             - containerPort: 80
               name: http
