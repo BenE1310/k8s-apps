@@ -1,0 +1,29 @@
+# Goes to  apps/kirtus-app.yaml  in github.com/BenE1310/k8s-apps
+#
+# root-app watches the `apps/` directory, so dropping this file there is all it
+# takes - ArgoCD creates the Application on its own.
+#
+# Copied from razshmallow-app, which is the existing precedent for "a project
+# with a database app and an application app in one namespace".
+#
+# Named kirtus-app, not kirtus: the Application already called `kirtus` is the
+# MongoDB one (it points at base/kirtus/mongodb). The two do not collide -
+# ArgoCD prunes only the resources each Application itself created.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kirtus-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/BenE1310/k8s-apps
+    path: base/kirtus/app
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kirtus
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

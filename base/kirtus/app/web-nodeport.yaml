@@ -1,0 +1,23 @@
+# LAN access for testing, following the pattern already used for Mongo in this
+# namespace (`mongodb-kirtus` ClusterIP + `mongodb-kirtus-nodeport` NodePort).
+#
+# The cluster has no Ingress at all - the lab exposes things through Cloudflare
+# Tunnel, not Traefik - so this is the way in from inside the network while we
+# validate. Browse: http://172.16.10.51:30080
+#
+# This is NOT how the site gets published. Real exposure is a cloudflared
+# Deployment in this namespace, exactly like razshmallow. That is a deliberate
+# separate step because it moves production traffic - see README.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-nodeport
+  namespace: kirtus
+spec:
+  type: NodePort
+  selector: { app: web }
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30080

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: kirtus
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: api }
+  template:
+    metadata:
+      labels: { app: api }
+    spec:
+      # bene1310/kirtus-api is a PRIVATE Docker Hub repo - without this the pod
+      # fails with ImagePullBackOff.
+      imagePullSecrets:
+        - name: dockerhub
+      containers:
+        - name: api
+          image: bene1310/kirtus-api:1.0.0
+          ports:
+            - containerPort: 5175
+          # ORDER MATTERS - the last source wins. Secret first (everything from
+          # server/.env), ConfigMap second so the lab values override it.
+          envFrom:
+            - secretRef:    { name: kirtus-secrets }
+            - configMapRef: { name: kirtus-config }
+          env:
+            - name: FIREBASE_SERVICE_ACCOUNT_PATH
+              value: /var/secrets/firebase/firebase-service-account.json
+          volumeMounts:
+            - name: firebase
+              mountPath: /var/secrets/firebase
+              readOnly: true
+          livenessProbe:
+            httpGet: { path: /health, port: 5175 }
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          readinessProbe:
+            # DB-aware: returns 503 until Mongo answers, so traffic waits.
+            httpGet: { path: /api/health, port: 5175 }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits:   { cpu: 500m, memory: 512Mi }
+      volumes:
+        - name: firebase
+          secret:
+            secretName: kirtus-firebase

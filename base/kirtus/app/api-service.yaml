@@ -1,0 +1,12 @@
+# MUST stay named `api`: nginx.conf baked into the web image proxies /api/ to
+# http://api:5175. Renaming this Service breaks every API call.
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: kirtus
+spec:
+  selector: { app: api }
+  ports:
+    - port: 5175
+      targetPort: 5175

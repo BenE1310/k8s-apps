@@ -1,0 +1,13 @@
+# MUST stay named `web`: the API fetches http://web/index.html to inject OG tags.
+# ClusterIP. In-cluster traffic uses this; LAN testing goes through
+# web-nodeport, and real publishing will go through a cloudflared pod.
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: kirtus
+spec:
+  selector: { app: web }
+  ports:
+    - port: 80
+      targetPort: 80

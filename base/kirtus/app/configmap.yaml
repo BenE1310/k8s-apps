@@ -1,0 +1,47 @@
+# Environment-specific, NON-secret config for the home k3s lab.
+#
+# Listed AFTER the Secret in every envFrom block on purpose: envFrom applies its
+# sources in order and the last one wins, so these values override server/.env.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kirtus-config
+  namespace: kirtus
+data:
+  PORT: "5175"
+
+  # MinIO runs INSIDE this cluster: Service `minio` in namespace `minio`
+  # (verified 2026-11-18, ClusterIP 10.43.39.39).
+  #
+  # Addressed by Service name, not by its MetalLB address 172.16.10.250: a pod
+  # talking to that external IP would leave the cluster and come back in through
+  # the load balancer on every image request. The MetalLB address can also change
+  # when the pool is re-planned - a Service name never does.
+  #
+  # `minio.minio` is service-name.namespace, required because this pod runs in
+  # the `kirtus` namespace; a bare `minio` would only resolve locally.
+  MINIO_ENDPOINT: "minio.minio"
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  MINIO_BUCKET: "kirtus-images"
+
+  # The API fetches the SPA shell from the web Service to inject per-event OG tags.
+  WEB_INDEX_URL: "http://web/index.html"
+
+  # ---------------------------------------------------------------------------
+  # DELIBERATELY the production hostname, NOT this instance's lab hostname.
+  #
+  # This pod shares the production database, so startSmsScheduler() here competes
+  # with the server on the Windows PC for the same scheduled campaigns. The claim
+  # is atomic so nothing double-sends, but whichever instance wins sends using ITS
+  # OWN PUBLIC_BASE_URL - and that value builds SMS_OPTOUT_URL, the legally
+  # required opt-out link on every marketing SMS (תיקון 40).
+  #
+  # A lab hostname here would mail real customers an opt-out link that resolves
+  # nowhere outside this LAN. Keep it pointed at the real site.
+  PUBLIC_BASE_URL: "https://kirtus.net"
+
+  # Comma-separated allowlist. Same-origin browsing of the lab hostname needs no
+  # entry (no Origin header is sent), so this only has to cover the real site.
+  # Add the lab hostname here if anything ever calls the API cross-origin.
+  CORS_ORIGIN: "https://kirtus.net"
