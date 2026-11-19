@@ -41,7 +41,18 @@ data:
   # nowhere outside this LAN. Keep it pointed at the real site.
   PUBLIC_BASE_URL: "https://kirtus.net"
 
-  # Comma-separated allowlist. Same-origin browsing of the lab hostname needs no
-  # entry (no Origin header is sent), so this only has to cover the real site.
-  # Add the lab hostname here if anything ever calls the API cross-origin.
-  CORS_ORIGIN: "https://kirtus.net"
+  # Comma-separated allowlist. EVERY origin the browser will use must be listed,
+  # including the lab's own address: browsers send an Origin header on POST/PUT/
+  # DELETE even when the request is same-origin (they omit it only on GET). Leave
+  # the lab entry out and the site renders perfectly while every write fails —
+  # login, checkout, event creation — because the CORS callback rejects them.
+  #
+  # Note the rejection surfaces as HTTP 500, not 403: index.js calls
+  # cb(new Error('Not allowed by CORS')) and Express turns that into a 500.
+  #
+  # Production never hits this path. server/.env has no CORS_ORIGIN at all, so
+  # index.js falls back to `origin: true` and allows everything. Setting the key
+  # here is what switches the strict check on, so this list is ours to maintain.
+  #
+  # Drop the NodePort entry once cloudflared gives this cluster a real hostname.
+  CORS_ORIGIN: "https://kirtus.net,http://172.16.10.51:30080"
