@@ -1,0 +1,91 @@
+# Cloudflare Tunnel connector — this is what puts the cluster on the public
+# internet. Outbound-only: it dials Cloudflare, so the cluster needs no inbound
+# firewall rule, no public IP and no port forwarding. That is also why it has no
+# Service of its own; nothing ever connects *to* it.
+#
+# The tunnel is remotely managed (token), so the public hostname → service
+# routing lives in the Cloudflare Zero Trust dashboard, not here. Same pattern as
+# razshmallow. One rule is enough:
+#
+#   kirtus.net  (no path)  →  HTTP  web.kirtus.svc.cluster.local:80
+#
+# Deliberately NOT a separate /api/* rule like razshmallow has. The nginx baked
+# into the web image already proxies /api/ to api:5175, and it also rewrites
+# /event/:id to /api/og/event/:id for the Open Graph tags on shared links. Route
+# /api/* around nginx and that rewrite still works, but then two different places
+# decide routing. One rule keeps the request path identical to what we tested on
+# the LAN through the NodePort.
+#
+# ROUTING IS PER-TUNNEL, NOT PER-CONNECTOR. Every connector on a tunnel gets the
+# same rules, so this cluster must have its OWN tunnel, separate from the one on
+# the Windows PC. Share a tunnel and whichever side cannot reach the configured
+# address starts serving errors for half the traffic.
+#
+# Failover to the Windows PC is therefore two steps, not one: point the kirtus.net
+# CNAME back at the old tunnel, then start the .bat scripts. A hostname's DNS
+# record names exactly one tunnel; automatic failover would need a Cloudflare
+# Load Balancer, which costs money.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: kirtus
+  labels:
+    app: cloudflared
+    project: kirtus
+spec:
+  replicas: 2          # two connectors → the tunnel survives a restart or a node
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+        project: kirtus
+    spec:
+      # Two replicas on the same node protect against a crash but not against
+      # losing the node. Preferred, not required, so a single-node cluster still
+      # schedules both.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app: cloudflared
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:2026.11.0
+          args:
+            - tunnel
+            - --no-autoupdate
+            - --metrics
+            - 0.0.0.0:2000   # required for the probe below
+            - run
+          env:
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflared-token
+                  key: token
+          # /ready returns 200 only while at least one connection to Cloudflare is
+          # registered. READINESS, never liveness: a Cloudflare-side outage would
+          # make a liveness probe restart the container in a loop, which fixes
+          # nothing and throws away the backoff cloudflared already does itself.
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 2000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "32Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
