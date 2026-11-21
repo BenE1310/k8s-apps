@@ -4,13 +4,29 @@ metadata:
   name: api
   namespace: kirtus
 spec:
-  replicas: 1
+  # Two, so a config change, an image update or a lost node is not an outage.
+  # Safe to run in parallel: startSmsScheduler() claims a campaign atomically
+  # (scheduled -> sending), so no SMS goes out twice. The one thing that does not
+  # scale cleanly is the rate limiter - it is in-memory and per-pod, so the
+  # effective limit is doubled. Already true today, since the Windows instance
+  # runs alongside this one.
+  replicas: 2
   selector:
     matchLabels: { app: api }
   template:
     metadata:
       labels: { app: api }
     spec:
+      # Both replicas on one node survives a crash but not a lost node.
+      # Preferred, not required, so a one-node cluster still schedules both.
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels: { app: api }
       # bene1310/kirtus-api is a PRIVATE Docker Hub repo - without this the pod
       # fails with ImagePullBackOff.
       imagePullSecrets:

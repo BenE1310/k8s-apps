@@ -54,5 +54,8 @@ data:
   # index.js falls back to `origin: true` and allows everything. Setting the key
   # here is what switches the strict check on, so this list is ours to maintain.
   #
-  # Drop the NodePort entry once cloudflared gives this cluster a real hostname.
-  CORS_ORIGIN: "https://kirtus.net,http://172.16.10.51:30080"
+  # lab.kirtus.net is this cluster's own permanent hostname on the kirtus-k8s
+  # tunnel. It stays even after kirtus.net points here, because it is how you ask
+  # "is the site broken or is DNS broken?" without guessing — including after a
+  # failback, when kirtus.net is being served by the Windows PC again.
+  CORS_ORIGIN: "https://kirtus.net,https://www.kirtus.net,https://lab.kirtus.net,http://172.16.10.51:30080"

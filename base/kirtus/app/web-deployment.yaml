@@ -4,13 +4,23 @@ metadata:
   name: web
   namespace: kirtus
 spec:
-  replicas: 1
+  # Stateless nginx serving a built bundle - scaling it out costs nothing and
+  # removes the single point of failure in front of everything else.
+  replicas: 2
   selector:
     matchLabels: { app: web }
   template:
     metadata:
       labels: { app: web }
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels: { app: web }
       # bene1310/kirtus-web is PUBLIC - no pull secret needed.
       containers:
         - name: web
